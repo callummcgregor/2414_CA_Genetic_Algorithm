@@ -1,9 +1,9 @@
 package ga;
 
 /**
+ * A Cloneable subtype of Design to allow a new Design to be created with a existing Design's designvector
+ *
  * @author dev1 & dev2
- * @version 1.0
- * A cloneable subtype of Design allowing
  */
 public class CloneableDesign extends Design implements Cloneable{
 

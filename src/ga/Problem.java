@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author Jonathan Fieldsend 
  * @version 1.0
  */
-public interface Problem
+public interface Problem 
 {
     /**
      * Method to enable the evaluation of the given Design on this problem

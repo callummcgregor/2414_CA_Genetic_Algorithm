@@ -7,13 +7,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Class containing elite members and methods for handling the elite members list
+ *
  * @author dev1 & dev2
- * @version 1.0
  */
 public class EliteMembers {
     private final int noOfElites;
     private ArrayList<Design> eliteList = new ArrayList<Design>();
-    private ArrayList<Design> eliteListCopy = new ArrayList<Design>();
+    private volatile ArrayList<Design> eliteListCopy = new ArrayList<Design>(); // Elite list to be used if original one is locked
     private Lock lock = new ReentrantLock();
 
     public EliteMembers(int noOfElites) {
@@ -21,16 +22,16 @@ public class EliteMembers {
     }
 
     /**
-     * Compares the Design to those in the elite list and inserts into it's ordered position if necessary
+     * Compares a given Design to those in the elite list, determines if it's good enough and inserts if so
      *
-     * @param d the Design being compared to elite members
+     * @param d - Design being compared to elite members
      */
-    public synchronized void addToEliteIfGood(CloneableDesign d) {
+    public synchronized void auditionCandidateDesign(CloneableDesign d) {
         if (eliteList.size() == 0) {
             eliteList.add(d.clone());
         } else {
             for (int i = eliteList.size() - 1; i >= 0; i--) {
-                if (d.getValue().doubleValue() < eliteList.get(i).getValue().doubleValue()) { // TODO: comparison method doesn't seem to work!
+                if (d.getValue().doubleValue() < eliteList.get(i).getValue().doubleValue()) {
                     eliteList.add(i + 1, d.clone());
                     break;
                 }
@@ -44,6 +45,9 @@ public class EliteMembers {
         eliteListCopy = new ArrayList<Design>(eliteList);
     }
 
+    /**
+     * @return - a random Design from the Elite members list
+     */
     public Design getRandomDesign() {
         Random ranGen = new Random();
         if (!lock.tryLock()){
@@ -55,16 +59,6 @@ public class EliteMembers {
             lock.unlock();
             return eliteList.get(randIndex);
         }
-    }
-
-    // TODO: delme, development purposes only
-    public void printEliteList() {
-        int count = 0;
-        for (Design d : eliteList) {
-            System.out.println("Elite " + count + ": " + d.getValue());
-            count += 1;
-        }
-        System.out.println("Best value: " + eliteList.get(0).getValue().doubleValue());
     }
 
     private synchronized int getListSize(){
@@ -85,17 +79,16 @@ public class EliteMembers {
         }
     }
 
-    public void writeSerializedFile() {
+    public void writeSerializedDesignsToFile() {
         try {
             FileOutputStream fos = new FileOutputStream("designs.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-
             oos.writeObject(eliteList.toArray());
             oos.close();
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Unable to write designs.ser");
+            System.out.println("Unable to write to file");
         }
     }
 }
