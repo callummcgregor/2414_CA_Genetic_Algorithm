@@ -26,7 +26,7 @@ public class MultiThreadedGeneticAlgorithm implements EventListener {
     public MultiThreadedGeneticAlgorithm(String problemName, int noOfMembers, int noOfElites, float crossoverProb,
                                          float mutationProb, int noOfEvolutions) {
         try {
-            this.problem = Helper.getProblem("ga." + problemName);
+            this.problem = Helper.getProblem(problemName);
         } catch(GAInitiationException e) {
             System.out.println(e.getMessage());
             System.exit(1);
